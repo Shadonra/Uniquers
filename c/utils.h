@@ -1,5 +1,58 @@
 #include <stdlib.h>
+#include <time.h>
 
+unsigned long min(unsigned long a, unsigned long b);
+unsigned long max(unsigned long a, unsigned long b);
+
+int trailing_zeroes(long l);
+
+/*
+  An implementation of a hash with (implicit) striped matrix. 
+  This hash is 2-wise independent (2-universal)
+*/
+typedef struct hash_fn {
+  long stripe[2];
+  long offset;
+  
+  void init() {
+    srand(time(NULL));
+    
+    for(int i = 0; i < 2; i++) {
+      int l = rand();
+      int r = rand();
+      stripe[i] = ((long) l) << 32;
+      stripe[i] = stripe[i] ^ ((long) r);
+    }
+    offset = ((long) rand()) << 32;
+    offset = offset ^ ((long) rand());
+  } 
+
+  unsigned long parity(unsigned long x) {
+    int size = sizeof(long) * 4;
+    unsigned long parity = x;
+    while(size > 0) {
+      parity = parity ^ (parity << size);
+      size /= 2;
+    }
+    return parity;
+  }
+
+  unsigned long hash(unsigned long key) {
+    unsigned long ret = 0;
+    unsigned long mask = 1;
+    ret = ret | parity(key ^ stripe[0]);
+    for(int i = 1; i < sizeof(long) * 8; i++) {
+      unsigned long overfill = mask & key & stripe[1];
+      unsigned long rest = (~mask) & key & stripe[0];
+      ret = ret | ((parity(overfill) ^ parity(rest)) >> i);
+    }
+    return ret;
+  }
+} hash_fn;
+
+/*
+ * Array implementation of a heap 
+ */
 typedef struct heap {
   int capacity; 
   unsigned long *heap;
