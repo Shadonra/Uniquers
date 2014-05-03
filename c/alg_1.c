@@ -11,7 +11,7 @@
 
 void estimate_1 (long arr_size, long *arr, double epsilon, heap *small_values, hash_fn hash) {
   //max-heap - paper says to use binary search tree, but a heap will work
-  unsigned int heap_size = (unsigned int) (ceil(96.0 / epsilon * epsilon));
+  unsigned int heap_size = (unsigned int) (ceil(96.0 / (epsilon * epsilon)));
   
   long i;
   for(i = 0l; i < arr_size; i++) {

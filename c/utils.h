@@ -48,7 +48,7 @@ typedef struct hash_fn {
       ret = ret | ((parity(overfill) ^ parity(rest)) >> i);
       mask = mask >> 1;
     }
-    return ret;
+    return ret ^ offset;
   }
 } hash_fn;
 

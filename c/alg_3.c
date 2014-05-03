@@ -16,8 +16,8 @@ void estimate_3 (
   hash_fn h, 
   hash_fn g, 
   struct rb_table **buffer, 
-  int *t, 
-  int *buf_elements) {
+  unsigned int *t, 
+  unsigned int *buf_elements) {
   
   unsigned const int BUF_SIZE = ceil((576.0)/(epsilon * epsilon));
   unsigned long *temp = (unsigned long*) malloc(sizeof(unsigned long));
@@ -34,8 +34,9 @@ void estimate_3 (
       rb_insert(buffer[trail], new_long);
       
       if(*buf_elements > BUF_SIZE) {
-        *buf_elements -= ((buffer[*t])->rb_count);
-        *t++;
+        printf("%d %d\n", *buf_elements, *t);
+        (*buf_elements) -= ((buffer[*t])->rb_count);
+        (*t)++;
       }
     }
   }

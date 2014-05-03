@@ -16,7 +16,7 @@ unsigned long min (unsigned long a, unsigned long b) {
 }
 
 unsigned long max(unsigned long a, unsigned long b) {
-  return (a < b) ? a : b;
+  return (a > b) ? a : b;
 }
 
 int trailing_zeroes(long l) {

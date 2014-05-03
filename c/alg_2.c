@@ -1,10 +1,10 @@
 #include <stdlib.h>
 #include "utils.h"
-
+#include <stdio.h>
 /*  First stage - use Flajolet-Martin algorithm to approximate F_0 within a constant factor
  *  Do this by hashing each input long and counting number of trailing 0s
  */
-int hyper_log_log (int arr_size, long* arr, hash_fn hash) {
+int hyper_log_log(int arr_size, long* arr, hash_fn hash) {
   int max_trailing_zeroes = 0;
   int i;
 
@@ -21,9 +21,16 @@ int hyper_log_log (int arr_size, long* arr, hash_fn hash) {
  */
 
 
-int alg_2 (int arr_size, long* arr, long r, hash_fn hash) {
-  
+void estimate_2(size_t arr_size, long* arr, long r_mask, size_t hashes_size, hash_fn** hashes) {
+  int i, j;
+  for(i = 0; i < arr_size; i++) {
+    for(j = 0; j < hashes_size; j++) {
+      if(hashes[j] == NULL) continue;
+      if((hashes[j]->hash(arr[i]) & r_mask) == 0) { //take mod r
+        free(hashes[j]);
+        hashes[j] = NULL;
+      }
+    }
+  }
 }
 
-int main() {
-}
