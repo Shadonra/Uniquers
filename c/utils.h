@@ -8,6 +8,7 @@ unsigned long max(unsigned long a, unsigned long b);
 
 int trailing_zeroes(long l);
 int compare_long (const void*, const void*, void*);
+int reverse_compare_long(const void*, const void*, void*);
 /* An implementation of a hash with (implicit) striped matrix. 
    This hash is 2-wise independent (2-universal)
 */
@@ -16,8 +17,9 @@ typedef struct hash_fn {
   long offset;
   
   void init() {
-    srand(time(NULL));
-    
+    init(time(NULL));
+  } 
+  void init(int seed) {
     for(int i = 0; i < 2; i++) {
       int l = rand();
       int r = rand();
@@ -26,8 +28,8 @@ typedef struct hash_fn {
     }
     offset = ((long) rand()) << 32;
     offset = offset ^ ((long) rand());
-  } 
-
+    
+  }
   unsigned long parity(unsigned long x) {
     int size = sizeof(long) * 4;
     unsigned long parity = x;

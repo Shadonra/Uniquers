@@ -34,7 +34,6 @@ void estimate_3 (
       rb_insert(buffer[trail], new_long);
       
       if(*buf_elements > BUF_SIZE) {
-        printf("%d %d\n", *buf_elements, *t);
         (*buf_elements) -= ((buffer[*t])->rb_count);
         (*t)++;
       }

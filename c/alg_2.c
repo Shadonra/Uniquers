@@ -23,6 +23,7 @@ int hyper_log_log(int arr_size, long* arr, hash_fn hash) {
 
 void estimate_2(size_t arr_size, long* arr, long r_mask, size_t hashes_size, hash_fn** hashes) {
   int i, j;
+  printf("%x\n", r_mask);
   for(i = 0; i < arr_size; i++) {
     for(j = 0; j < hashes_size; j++) {
       if(hashes[j] == NULL) continue;

@@ -5,9 +5,9 @@
 #include "alg_1.h"
 #include "alg_2.h"
 #include "alg_3.h"
-
+#include "rb.h"
 #define IN_BUF_SIZE 134217728
-const double EPSILON = (1.0/16.0);
+const double EPSILON = (1.0/32.0);
 //extern void estimate_1(long arr_size, long* arr, double epsilon, heap small_values, hash_fn hash);
 
 int main(int argc, char *argv[]) {
@@ -22,17 +22,22 @@ int main(int argc, char *argv[]) {
     hash_fn hash;
     hash.init();
 
-    heap small_values;
-    unsigned int heap_size = (unsigned int) ceil(96 / (EPSILON * EPSILON)); //paper says to use this number
-    small_values.init(heap_size);
+    struct rb_table *small_values = rb_create(compare_long, NULL, NULL);
+    unsigned int tree_size = (unsigned int) ceil(96 / (EPSILON * EPSILON));
+    struct rb_traverser sv_trav;
+    rb_t_init(&sv_trav, small_values);
+    //paper says to use this size
 
-    size_t bytes_read;
+    size_t longs_read;
     unsigned long total = 0;
-    long* in_buf = (long*) malloc(IN_BUF_SIZE * sizeof(long));
-    while((bytes_read = fread(in_buf, sizeof(long), IN_BUF_SIZE, infile)) != 0) {
-      estimate_1(bytes_read / sizeof(long), in_buf, EPSILON, &small_values, hash);
+    unsigned long* in_buf = (unsigned long*) malloc(IN_BUF_SIZE * sizeof(long));
+    while((longs_read = fread(in_buf, sizeof(long), IN_BUF_SIZE, infile)) != 0) {
+      estimate_1(longs_read, in_buf, EPSILON, small_values, &sv_trav, hash);
     }
-    printf("%ld unique elements\n", ((long) heap_size) * (((unsigned long) 1l << 63) / small_values.peek()));
+    printf("%d %lu %lu\n", small_values->rb_count, *(unsigned long*)(rb_t_last(&sv_trav, small_values)), 1l<<64);
+    printf("%ld unique elements\n", ((long)small_values->rb_count) * 
+      (((unsigned long) (~0l)) / 
+        (*(unsigned long*)(rb_t_last(&sv_trav, small_values)))));
     free(in_buf);
 
   } else if (algorithm_number == 2) {
@@ -41,24 +46,25 @@ int main(int argc, char *argv[]) {
     hash_fn **hashes = (hash_fn**) malloc(sizeof(hash_fn*) * num_hashes);
     for(i = 0; i < num_hashes; i++) {
       hashes[i] = (hash_fn*) malloc(sizeof(hash_fn));
-      (hashes[i])->init();
+      (hashes[i])->init(time(NULL) + i);
+      printf("%x%x\n", hashes[i]->stripe[0], hashes[i]->stripe[1]);
     }
     hash_fn hll_hash;
     hll_hash.init();
     
-    size_t bytes_read;
+    size_t longs_read;
     unsigned long* in_buf = (unsigned long*) malloc(IN_BUF_SIZE * sizeof(long));
     int r = 0;
-    while((bytes_read = fread(in_buf, sizeof(long), IN_BUF_SIZE, infile)) != 0) {
-      r = max(r, hyper_log_log(bytes_read/sizeof(long), in_buf, hll_hash));
+    while((longs_read = fread(in_buf, sizeof(long), IN_BUF_SIZE, infile)) != 0) {
+      r = max(r, hyper_log_log(longs_read, in_buf, hll_hash));
       printf("%d\n", r);
     }
-    
     rewind(infile);
-    long mask = (1l << 63) >> (62 - r);
-    printf("%d\n", mask);
-    while((bytes_read = fread(in_buf, sizeof(long), IN_BUF_SIZE, infile)) != 0) {
-      estimate_2(bytes_read/8, in_buf, ~mask, num_hashes, hashes);
+    long mask = (1l << 63) >> (63 - r);
+    printf("%lx\n", ~mask);
+    while((longs_read = fread(in_buf, sizeof(long), IN_BUF_SIZE, infile)) != 0) {
+      estimate_2(longs_read, in_buf, ~mask, num_hashes, hashes);
+      printf("got here\n");
     }
     int counter = 0;
     for(i = 0; i < num_hashes; i++) {
@@ -80,16 +86,16 @@ int main(int argc, char *argv[]) {
     h.init();
     g.init();
     
-    size_t bytes_read;
+    size_t longs_read;
     unsigned long* in_buf = (unsigned long*) malloc(IN_BUF_SIZE * sizeof(long));
     unsigned int *t = (unsigned int*) malloc(sizeof(int));
     *t = 0;
     unsigned int *buf_elements = (unsigned int*) malloc(sizeof(int));
     *buf_elements = 0;
-    while((bytes_read = fread(in_buf, sizeof(long), IN_BUF_SIZE, infile)) != 0) {
-      estimate_3(bytes_read / sizeof(long), in_buf, 1.0/50.0, h, g, buffer, t, buf_elements);
+    while((longs_read = fread(in_buf, sizeof(long), IN_BUF_SIZE, infile)) != 0) {
+      estimate_3(longs_read, in_buf, EPSILON, h, g, buffer, t, buf_elements);
     }
-    printf("%d\n unique elements", *buf_elements * (1 << (*t)));
+    printf("%d unique elements\n", *buf_elements * (1 << (*t)));
   } else {
     printf("Invalid number, use either 1, 2, or 3\n");
   }
