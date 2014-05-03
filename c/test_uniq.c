@@ -34,7 +34,6 @@ int main(int argc, char *argv[]) {
     while((longs_read = fread(in_buf, sizeof(long), IN_BUF_SIZE, infile)) != 0) {
       estimate_1(longs_read, in_buf, EPSILON, small_values, &sv_trav, hash);
     }
-    printf("%d %lu %lu\n", small_values->rb_count, *(unsigned long*)(rb_t_last(&sv_trav, small_values)), 1l<<64);
     printf("%ld unique elements\n", ((long)small_values->rb_count) * 
       (((unsigned long) (~0l)) / 
         (*(unsigned long*)(rb_t_last(&sv_trav, small_values)))));
@@ -47,7 +46,6 @@ int main(int argc, char *argv[]) {
     for(i = 0; i < num_hashes; i++) {
       hashes[i] = (hash_fn*) malloc(sizeof(hash_fn));
       (hashes[i])->init(time(NULL) + i);
-      printf("%x%x\n", hashes[i]->stripe[0], hashes[i]->stripe[1]);
     }
     hash_fn hll_hash;
     hll_hash.init();
@@ -57,14 +55,12 @@ int main(int argc, char *argv[]) {
     int r = 0;
     while((longs_read = fread(in_buf, sizeof(long), IN_BUF_SIZE, infile)) != 0) {
       r = max(r, hyper_log_log(longs_read, in_buf, hll_hash));
-      printf("%d\n", r);
     }
     rewind(infile);
     long mask = (1l << 63) >> (63 - r);
     printf("%lx\n", ~mask);
     while((longs_read = fread(in_buf, sizeof(long), IN_BUF_SIZE, infile)) != 0) {
       estimate_2(longs_read, in_buf, ~mask, num_hashes, hashes);
-      printf("got here\n");
     }
     int counter = 0;
     for(i = 0; i < num_hashes; i++) {
@@ -72,7 +68,6 @@ int main(int argc, char *argv[]) {
         counter++;
       }
     }
-    printf("%d %d  %d\n", counter, num_hashes, r);
     printf("%ld\n", (long) ((log(1.0 - (((double)counter)/(double)num_hashes)))/log(1.0 - (1.0/((double (1 << r)))))));
     
   } else if (algorithm_number == 3) {

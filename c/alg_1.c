@@ -10,23 +10,9 @@
  * Let v be the largest such value, and estimate the number of unique elements in arr to be F_0 = t / v
  */
 
-typedef struct super_long {
-  long l;
-  long m;
-  long r;
-} super_long;
-
-super_long super_hash(hash_fn hashes[3], long l) {
-  super_long ret;
-  ret.l = hashes[0].hash(l);
-  ret.m = hashes[1].hash(l);
-  ret.r = hashes[2].hash(l);
-  return ret;
-}
 
 void estimate_1 (size_t arr_size, unsigned long *arr, double epsilon, struct rb_table *small_values, struct rb_traverser *sv_trav, hash_fn hash) {
   size_t tree_size = (unsigned int) (ceil(96.0 / (epsilon * epsilon)));
-  printf("%d\n", tree_size);
   int i;
   unsigned long *last;
   for(i = 0; i < arr_size; i++) {
