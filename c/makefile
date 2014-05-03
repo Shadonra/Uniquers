@@ -1,5 +1,5 @@
 CC = g++
-CFLAGS = -O2 -fpermissive
+CFLAGS = -O2 -fpermissive 
 
 alg_1: alg_1.c alg_1.h
 	$(CC) $(CFLAGS) -c alg_1.c alg_1.h

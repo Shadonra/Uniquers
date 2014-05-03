@@ -39,8 +39,8 @@ int main(int argc, char *argv[]) {
 
   } else if (algorithm_number == 3) {
     int i;
-    struct rb_table **buffer = (struct rb_table **)malloc(sizeof(struct rb_table *) * 64);
-    for(i = 0; i < 64; i++) {
+    struct rb_table **buffer = (struct rb_table **) malloc(sizeof(struct rb_table *) * 65);
+    for(i = 0; i < 65; i++) {
       buffer[i] = rb_create(compare_long, NULL, NULL);
     }
     hash_fn h;
@@ -50,13 +50,14 @@ int main(int argc, char *argv[]) {
     
     size_t bytes_read;
     unsigned long* in_buf = (unsigned long*) malloc(IN_BUF_SIZE * sizeof(long));
-    int t = 0;
-    int buf_elements = 0;
-
+    int *t = (int*) malloc(sizeof(int));
+    *t = 0;
+    int *buf_elements = (int*) malloc(sizeof(int));
+    *buf_elements = 0;
     while((bytes_read = fread(in_buf, sizeof(long), IN_BUF_SIZE, infile)) != 0) {
-      estimate_3(bytes_read / sizeof(long), in_buf, 1.0/20.0, h, g, buffer, &t, &buf_elements);
+      estimate_3(bytes_read / sizeof(long), in_buf, 1.0/20.0, h, g, buffer, t, buf_elements);
     }
-    printf("%ld\n", (long)buf_elements * (long)pow(2, t));
+    printf("%ld\n", (long)buf_elements * (long)pow(2, (double)*t));
   } else {
     printf("Invalid number, use either 1, 2, or 3\n");
   }
