@@ -12,7 +12,17 @@ int hyper_log_log (int arr_size, long* arr, hash_fn hash) {
     long hash_value = hash.hash(arr[i]);
     max_trailing_zeroes = max(max_trailing_zeroes, trailing_zeroes(hash_value));
   }
-  return max_trailing_zeroes;
+  return max_trailing_zeroes; // F_0 is approximately 1 << max_trailing_zeroes with positive probability
+}
+
+/*
+ * Actually, what we care about is the (bad) approximation from hyper-log-log -
+ * We want a number (r) of approximately the same order of magnitude as F_0.
+ */
+
+
+int alg_2 (int arr_size, long* arr, long r, hash_fn hash) {
+  
 }
 
 int main() {
