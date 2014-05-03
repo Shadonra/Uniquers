@@ -19,18 +19,18 @@ void estimate_1 (size_t arr_size, unsigned long *arr, double epsilon, struct rb_
     unsigned long *hash_val = (unsigned long*) malloc(sizeof(long));
     *hash_val = hash.hash(arr[i]);
     
-    if(rb_find(small_values, hash_val)) {
+    if(rb_find(small_values, hash_val)) { //ignore repeats
       free(hash_val);
       continue;
     
-    } else if(small_values->rb_count < tree_size) {
+    } else if(small_values->rb_count < tree_size) { //if tree's not full yet, stuff it
       rb_insert(small_values, hash_val);
     
-    } else if(last && *hash_val < *last) {
+    } else if(last && *hash_val < *last) { //keep the |tree_size| smallest vals
       rb_delete(small_values, last);
       rb_insert(small_values, hash_val);
     
-    } else free(hash_val);
+    } else free(hash_val); 
 
     last = (unsigned long*) rb_t_last(sv_trav, small_values);
   }

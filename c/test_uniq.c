@@ -7,7 +7,7 @@
 #include "alg_3.h"
 #include "rb.h"
 #define IN_BUF_SIZE 134217728
-const double EPSILON = (1.0/32.0);
+const double EPSILON = (1.0/8.0);
 //extern void estimate_1(long arr_size, long* arr, double epsilon, heap small_values, hash_fn hash);
 
 int main(int argc, char *argv[]) {
@@ -56,18 +56,21 @@ int main(int argc, char *argv[]) {
     while((longs_read = fread(in_buf, sizeof(long), IN_BUF_SIZE, infile)) != 0) {
       r = max(r, hyper_log_log(longs_read, in_buf, hll_hash));
     }
+    
     rewind(infile);
     long mask = (1l << 63) >> (63 - r);
-    printf("%lx\n", ~mask);
+    
     while((longs_read = fread(in_buf, sizeof(long), IN_BUF_SIZE, infile)) != 0) {
       estimate_2(longs_read, in_buf, ~mask, num_hashes, hashes);
     }
-    int counter = 0;
+    
+    int counter = 0; 
     for(i = 0; i < num_hashes; i++) {
       if(hashes[i] == NULL) {
         counter++;
       }
     }
+    
     printf("%ld\n", (long) ((log(1.0 - (((double)counter)/(double)num_hashes)))/log(1.0 - (1.0/((double (1 << r)))))));
     
   } else if (algorithm_number == 3) {
